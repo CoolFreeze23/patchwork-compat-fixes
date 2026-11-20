@@ -45,9 +45,11 @@ Date: 2026-11-21
       and Advanced Furnaces 2 furnaces lack), sniper range, all 5Dim tier rescales, spidertron grid
       (K2 grid stays 10x6 while some-spidertron sets 24x22), Advanced Furnaces 2 productivity, loader
       upgrades and circuits, smart belt dragging for Advanced Furnaces 2 pro belts.
-    - 5Dim reactor and heat exchanger tiers (5dim_nuclear) have no 2.1 release yet; that module stays
-      inactive without them. Added 5dim_nuclear as an optional dependency for load order.
-    - Deadlock loaders and Mini Machines compat have no 2.1 releases; their parts keep no-oping.
+    - 5Dim reactor and heat exchanger tiers: verified with 5dim_nuclear 2.1.1 under Krastorio 2 (reactor
+      tier 2 54MW -> 337.5MW against K2's 250MW base, neighbour bonus 0.25; heat exchanger tier 2
+      14MW -> 70MW, steam 415C). Added 5dim_nuclear as an optional dependency for load order.
+    - Deadlock loaders and Mini Machines compat have no official 2.1 releases; with 2.1 builds of them
+      installed the loader modules cover their loaders as before.
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.4
 Date: 2026-07-28
