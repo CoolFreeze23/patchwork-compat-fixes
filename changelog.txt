@@ -1,6 +1,13 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.0
 Date: 2026-11-21
+  Bugfixes:
+    - New module missing-item-icons: on Factorio 2.1, 5Dim Logistic gives the vanilla roboport an
+      icon list with a tier badge, and Factorissimo's hidden construction-roboport item copied the
+      now-empty single icon field, so the full pack failed to load ("Key icon not found"). Items left
+      without any icon now copy it from their source item or placed entity. Runs in the data stage
+      (before the recycler and Long Range Delivery Drones read item icons) and again in
+      data-final-fixes.
   Changes:
     - Updated for Factorio 2.1 (requires base 2.1.0). Every module was re-checked against the 2.1
       releases of the mods it fixes (Krastorio 2 2.1.4, 5Dim 2.1.x, Mini Machines 9.5.9, Space
