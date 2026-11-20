@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------------------------------
+Version: 1.0.4
+Date: 2026-07-28
+  Features:
+    - First control-stage (runtime) fix module: AutoDeconstruct loader-chain chest guard.
+      AutoDeconstruct's "remove target" option deconstructs a depleted drill's output chest
+      unless a drill/inserter/assembler/furnace still drops into it - loaders are invisible to
+      that check (they attach via loader_container, not drop_target; still unfixed upstream as
+      of AutoDeconstruct 1.1.1), so a chest relaying a loader->chest->loader transport chain
+      was torn out with the drill and the whole line went dead. Now, when a script marks a
+      container for deconstruction while a loader is connected to it and a depleted drill drops
+      into it, the mark is cancelled. The drill itself is still removed, plain drill->chest->
+      inserter cleanups still work, and player deconstruction-planner marks are never touched.
+---------------------------------------------------------------------------------------------------
+Version: 1.0.3
+Date: 2026-07-27
+  Features:
+    - Full 5Dim-vs-base-rebalance audit (every 5Dim tier family compared against the pack's final
+      base prototypes). Three new modules for the families found desynced:
+    - Belt tiers: 5Dim underground belts 04-10 kept the vanilla express reach (9) while Krastorio 2
+      extends the base express underground to 20 - faster belts had less than half the reach of the
+      slower base belt. Now rescaled by the base factor (reach 20).
+    - Turret tiers: 5Dim gun turrets derive range from vanilla (18) vs K2's base 25 - tier 2 (24)
+      had LESS range than the base turret; laser tiers derive from vanilla range 24 / damage x1 vs
+      K2's 30 / x3 - every laser tier did a third of its intended relative damage. Ranges and laser
+      damage rescaled by the base factors.
+    - Power tiers: K2 sets the base nuclear reactor to 250MW (vanilla 40MW), so ALL 5Dim reactor
+      tiers (60-220MW) made less heat than the base reactor; rescaled to 375MW-1375MW with the
+      reactor neighbour bonus following the base (0.25). 5Dim heat exchangers (10MW-derived,
+      500 degree steam) rescaled by the base factor (50MW -> 75-275MW) and now produce the base
+      exchanger's steam temperature (415) so the whole nuclear loop stays on one balance system.
+    - Audited clean, no changes needed: assemblers, furnaces, centrifuges, chemical plants, oil
+      refineries, inserters, belts/splitters (speeds), drills, pumpjacks, labs, radars, roboports,
+      all power poles, walls, gates, chests, storage tanks, boilers, steam engines/turbines,
+      pumps, offshore pumps, cargo/fluid wagons, accumulators.
+---------------------------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2026-07-27
+  Features:
+    - Train tiers: 5Dim locomotives are rescaled by the same per-stat factors other mods apply to
+      the base locomotive (Krastorio 2: 2MW/10000 weight/braking 30 vs vanilla 600kW/2000/10).
+      Previously even the tier-10 5Dim locomotive (1.5MW) had less pulling power than the base
+      engine, so every "upgrade" made trains accelerate worse. Now tiers run 2.33MW/12500 up to
+      5MW/32500 and loaded-train acceleration ascends with tier. Top speed follows the base
+      engine's rebalance factor as well; each tier keeps its intended progression over tier 1.
+---------------------------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2026-07-10
+  Features:
+    - Smart belt dragging: transport belts missing the 2.0 related_underground_belt field are paired with their underground by exact name convention and matching speed (fixes Advanced Furnaces 2 pro belts not auto-placing undergrounds when dragging over obstacles).
+---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2026-07-10
+  Major Features:
+    - Initial release: nine cross-mod compatibility fixes in one mod, one self-contained module per fix.
+    - Every fix silently skips itself when its target mods are not installed - safe to keep enabled in any modpack.
+    - Every fix defers to its original standalone fix mod if that is still installed, so nothing is ever applied twice.
+  Features:
+    - 5Dim labs: every 5Dim lab and biolab tier accepts the same science packs as the base lab and biolab.
+    - Furnace smelting: 5Dim furnaces, Mini Machines mini furnaces and Advanced Furnaces 2 receive the full smelting category set (including Krastorio 2 coke/kiln), with furnace-to-assembling-machine conversion in packs that smelt in assemblers, enabling multi-ingredient smelting recipes.
+    - Sniper range: projectile ammo max range is raised per ammo category to the longest turret range using it, so long-range turrets (5Dim snipers, cannon turrets) actually hit what they target when a mod (Krastorio 2) turns bullets into 30-tile projectiles.
+    - Energy tiers: 5Dim solar panels and accumulators are rescaled by the same factor other mods apply to the base entities, keeping every tier's intended progression over tier 1.
+    - Hovercrafts: hovercraft fuel slots fall back to the chemical fuel category when no installed mod defines the "vehicle-fuel" category.
+    - Spidertron grid: the equipment grid the spidertron actually uses (e.g. Krastorio 2's kr grid) is synced to the enlarged size from some-spidertron, surviving Spidertron Extended's late resize.
+    - Productivity: Advanced Furnaces 2's wood-to-coal and direct ore-to-steel recipes accept productivity modules (the mod predates Factorio 2.0's per-recipe allow_productivity flag).
+    - Loader upgrades: all land 1x1 loaders (Deadlock, Krastorio 2, Advanced Furnaces 2, 5Dim) are normalized to one fast-replace group and identical collision geometry, so the upgrade planner offers every family as a target for every other; Space Exploration space loaders stay untouched. Side effect: all 1x1 loaders become walkable, like belts.
+    - Loader circuits: every loader lacking circuit connectivity gains the standard 9-tile wire reach (enable/disable, set filters, read transfers).
+  Info:
+    - Pair with 5dim-mini-mining-fix if you run 5Dim mining + Mini Machines + Krastorio 2: that fix must load BEFORE mini-machines' final pass, while this pack's furnace fix must load after it, so it cannot be bundled here.
+    - Collision-layer references are filtered against the layers that exist in your install, so the loader fix is safe without any space mods.
