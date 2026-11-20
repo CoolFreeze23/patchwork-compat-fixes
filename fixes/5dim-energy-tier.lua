@@ -15,7 +15,8 @@ if mods["5dim-energy-tier-fix"] then return end
 -- that same factor. Each tier keeps its intended percentage over tier 1
 -- regardless of which mod (or combination) rebalanced the base entity.
 
--- Vanilla values 5dim_energy 2.0.x derives its progression from
+-- Vanilla values 5dim_energy derives its progression from (2.1.x: hardcoded
+-- basePower 60kW / 5MJ / 300kW with a x1.45-per-tier curve)
 local VANILLA_SOLAR_PRODUCTION_W = 60e3 -- 60kW
 local VANILLA_ACCU_BUFFER_J = 5e6 -- 5MJ
 local VANILLA_ACCU_FLOW_W = 300e3 -- 300kW
@@ -51,12 +52,43 @@ local function scale_stat(entity_name, field_desc, value, mult)
     return new_value
 end
 
+-- Double-scale guard: 5Dim derives its tiers from hardcoded vanilla numbers,
+-- so a tier-2 value still BELOW a raised base value proves the tiers were not
+-- rebalanced by anyone. If tier 2 already reaches the base value, 5Dim (or
+-- another mod) already follows the rebalanced base and rescaling again would
+-- double-scale - leave the family alone. Only raised stats (mult > 1) can be
+-- told apart this way; a family whose stats were only lowered is left as-is.
+local function tiers_still_vanilla(family, checks)
+    local raised = 0
+    for _, c in ipairs(checks) do
+        if c.mult and c.mult > 1 then
+            raised = raised + 1
+            local tier2, base = parse_energy(c.tier2), parse_energy(c.base)
+            if not (tier2 and base and tier2 < base) then
+                log("[patchwork/energy-tier] " .. family .. ": tier 2 " .. c.field .. " " ..
+                    tostring(c.tier2) .. " already reaches the base " .. tostring(c.base) ..
+                    " - tiers already follow the base, left as-is")
+                return false
+            end
+        end
+    end
+    if raised == 0 then
+        log("[patchwork/energy-tier] " .. family .. ": base stats were only lowered, tiers left as-is")
+        return false
+    end
+    return true
+end
+
 -- Solar panels ---------------------------------------------------------------
 
 local base_solar = data.raw["solar-panel"]["solar-panel"]
 local solar_mult = base_solar and base_multiplier(base_solar.production, VANILLA_SOLAR_PRODUCTION_W)
 
-if solar_mult then
+local solar_t2 = data.raw["solar-panel"]["5d-solar-panel-02"]
+
+if solar_mult and solar_t2 and tiers_still_vanilla("solar", {
+    { field = "production", mult = solar_mult, tier2 = solar_t2.production, base = base_solar.production },
+}) then
     for i = 2, 10 do
         local panel = data.raw["solar-panel"][string.format("5d-solar-panel-%02d", i)]
         if panel then
@@ -64,7 +96,7 @@ if solar_mult then
                 or panel.production
         end
     end
-else
+elseif not solar_mult then
     log("[patchwork/energy-tier] base solar-panel unchanged from vanilla, solar tiers left as-is")
 end
 
@@ -76,7 +108,14 @@ local buffer_mult = base_accu_source and base_multiplier(base_accu_source.buffer
 local input_mult = base_accu_source and base_multiplier(base_accu_source.input_flow_limit, VANILLA_ACCU_FLOW_W)
 local output_mult = base_accu_source and base_multiplier(base_accu_source.output_flow_limit, VANILLA_ACCU_FLOW_W)
 
-if buffer_mult or input_mult or output_mult then
+local accu_t2 = data.raw["accumulator"]["5d-accumulator-02"]
+local accu_t2_source = accu_t2 and accu_t2.energy_source
+
+if (buffer_mult or input_mult or output_mult) and accu_t2_source and tiers_still_vanilla("accumulator", {
+    { field = "buffer_capacity", mult = buffer_mult, tier2 = accu_t2_source.buffer_capacity, base = base_accu_source.buffer_capacity },
+    { field = "input_flow_limit", mult = input_mult, tier2 = accu_t2_source.input_flow_limit, base = base_accu_source.input_flow_limit },
+    { field = "output_flow_limit", mult = output_mult, tier2 = accu_t2_source.output_flow_limit, base = base_accu_source.output_flow_limit },
+}) then
     for i = 2, 10 do
         local accu = data.raw["accumulator"][string.format("5d-accumulator-%02d", i)]
         if accu and accu.energy_source then
@@ -95,6 +134,6 @@ if buffer_mult or input_mult or output_mult then
             end
         end
     end
-else
+elseif not (buffer_mult or input_mult or output_mult) then
     log("[patchwork/energy-tier] base accumulator unchanged from vanilla, accumulator tiers left as-is")
 end

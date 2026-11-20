@@ -8,11 +8,12 @@
 --     mod cannot occupy both positions in the load order.)
 require("fixes.5dim-lab-science")
 require("fixes.5dim-furnace-smelting")
-require("fixes.5dim-sniper-range")
 require("fixes.5dim-energy-tier")
 require("fixes.5dim-train-tier")
 require("fixes.5dim-belt-tier")
 require("fixes.5dim-turret-tier")
+-- after turret-tier: projectile reach must follow the FINAL turret ranges
+require("fixes.5dim-sniper-range")
 require("fixes.5dim-power-tier")
 require("fixes.hovercraft-fuel")
 require("fixes.spidertron-grid")

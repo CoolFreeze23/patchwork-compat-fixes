@@ -1,11 +1,11 @@
 {
   "name": "patchwork-compat-fixes",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "title": "Patchwork — Cross-Mod Compatibility Fixes",
   "author": "Alvin",
-  "factorio_version": "2.0",
+  "factorio_version": "2.1",
   "dependencies": [
-    "base >= 2.0",
+    "base >= 2.1.0",
     "? Krastorio2",
     "? space-age",
     "? space-exploration",
@@ -17,6 +17,7 @@
     "? 5dim_transport",
     "? 5dim_battlefield",
     "? 5dim_logistic",
+    "? 5dim_nuclear",
     "? mini-machines",
     "? mini-machines-compat",
     "? Load-Furn-2-SpaceAgeFix",
@@ -30,5 +31,5 @@
     "? Better-Energy-production",
     "? AutoDeconstruct"
   ],
-  "description": "Fifteen cross-mod compatibility fixes that make big modpacks behave like one mod: 5Dim labs accept all science packs; 5Dim/mini/Advanced furnaces smelt everything incl. K2 coke; sniper bullets fly as far as sniper turrets see; 5Dim solar/accumulator/locomotive/underground-reach/turret/reactor/heat-exchanger tiers follow base rebalances; Hovercrafts fuel fallback; spidertron grid size sync; productivity on Advanced Furnaces wood-to-coal; all 1x1 loaders upgrade-planner interchangeable and circuit-connectable; smart belt dragging (auto-undergrounds) enabled for belts missing their underground pairing; AutoDeconstruct no longer removes drill-output chests that feed loader chains. Every fix silently disables itself when its target mods are not installed."
+  "description": "Fifteen cross-mod compatibility fixes that make big modpacks behave like one mod: 5Dim labs accept all science packs; 5Dim/mini/Advanced furnaces smelt everything incl. K2 coke; sniper bullets fly as far as sniper turrets see; 5Dim solar/accumulator/locomotive/underground-reach/turret/reactor/heat-exchanger tiers follow base rebalances (never scaled twice); Hovercrafts fuel fallback; spidertron grid size sync; productivity on Advanced Furnaces wood-to-coal; all 1x1 loaders upgrade-planner interchangeable and circuit-connectable; smart belt dragging (auto-undergrounds) enabled for belts missing their underground pairing; AutoDeconstruct before 1.1.2 no longer removes drill-output chests that feed loader chains. Every fix silently disables itself when its target mods are not installed."
 }

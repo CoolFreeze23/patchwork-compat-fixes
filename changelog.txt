@@ -1,4 +1,47 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.0
+Date: 2026-11-21
+  Changes:
+    - Updated for Factorio 2.1 (requires base 2.1.0). Every module was re-checked against the 2.1
+      releases of the mods it fixes (Krastorio 2 2.1.4, 5Dim 2.1.x, Mini Machines 9.5.9, Space
+      Exploration 0.7.64, Hovercrafts 2.1.4, some-spidertron 2.1.0, Spidertron Extended 0.4.4,
+      AutoDeconstruct 1.1.2, Advanced Furnaces 2 0.3.0).
+    - Rescaling modules (5Dim solar/accumulator, locomotive, underground belt, gun/laser turret,
+      reactor/heat exchanger tiers) now check that the 5Dim tiers are still derived from vanilla
+      before rescaling: if tier 2 already reaches the rebalanced base value, 5Dim (or another mod)
+      already follows the base and the family is left untouched instead of being scaled twice.
+      Base stats that were only lowered are no longer rescaled.
+    - 5Dim labs: tiers now keep their own science packs and gain every pack the base lab accepts
+      (Krastorio 2 tech cards, SE rocket science), instead of having their list replaced. With
+      Krastorio 2 the replacement copied K2's basic lab list and stripped production, utility and
+      space science from 5Dim labs 02-10.
+    - Loader upgrades: the shared collision mask now comes from the vanilla loader-1x1 (its own
+      mask, else the engine default for loaders), so SE's space-tile rule and future default
+      layers carry over; no more hardcoded layer list. Krastorio 2 2.1's 0.45-deep loader box and
+      the 5Dim "loader-1x1" group are still normalized.
+    - Hovercrafts fuel: Hovercrafts 2.1 picks a valid category itself ("kr-vehicle-fuel" with K2,
+      "chemical" otherwise), so the original bug is gone; the module now only replaces a fuel
+      category that no installed mod defines and does nothing on current releases.
+    - AutoDeconstruct loader-chest guard: AutoDeconstruct 1.1.2 counts input loaders as item
+      sources itself, so relay chests are kept upstream. On 1.1.2 and newer the guard stands down,
+      because it would otherwise cancel marks AutoDeconstruct places on purpose (a depleted
+      drill's chest drained only by an output loader). It still applies to older versions.
+  Bugfixes:
+    - Turret tiers: the laser damage factor used 1 as the vanilla damage modifier; vanilla laser
+      turrets use 2, so 5Dim laser tiers were scaled x3 instead of x1.5 under Krastorio 2.
+    - Sniper range: projectile ammo reach is now raised after the turret-tier rescale, so it follows
+      the final turret ranges (bullets reached 47 tiles while the rescaled 5Dim gun turret 10 targets
+      at 63; now 65).
+  Info:
+    - Still needed on 2.1 (bug confirmed in the 2.1 releases): 5Dim lab packs, furnace smelting
+      (5Dim industrial furnace; SE moves K2 coke/silicon to "kiln", which 5Dim, Mini Machines 2-10
+      and Advanced Furnaces 2 furnaces lack), sniper range, all 5Dim tier rescales, spidertron grid
+      (K2 grid stays 10x6 while some-spidertron sets 24x22), Advanced Furnaces 2 productivity, loader
+      upgrades and circuits, smart belt dragging for Advanced Furnaces 2 pro belts.
+    - 5Dim reactor and heat exchanger tiers (5dim_nuclear) have no 2.1 release yet; that module stays
+      inactive without them. Added 5dim_nuclear as an optional dependency for load order.
+    - Deadlock loaders and Mini Machines compat have no 2.1 releases; their parts keep no-oping.
+---------------------------------------------------------------------------------------------------
 Version: 1.0.4
 Date: 2026-07-28
   Features:

@@ -19,7 +19,8 @@ if mods["5dim-train-tier-fix"] then return end
 -- out-pulls the base engine again and loaded-train acceleration ascends with
 -- tier for any realistic consist.
 
--- Vanilla values 5dim_trains 2.0.x derives its progression from
+-- Vanilla values 5dim_trains derives its progression from (2.1.x: hardcoded
+-- 600kW / 2000 / braking 10 / speed 1.2, power x1.75 and weight/speed x1.45 per tier)
 local VANILLA_LOCO_POWER_W = 600e3 -- 600kW
 local VANILLA_LOCO_WEIGHT = 2000
 local VANILLA_LOCO_BRAKING = 10
@@ -79,7 +80,41 @@ local weight_mult = base_loco and number_multiplier(base_loco.weight, VANILLA_LO
 local braking_mult = base_loco and number_multiplier(base_loco.braking_force, VANILLA_LOCO_BRAKING)
 local speed_mult = base_loco and number_multiplier(base_loco.max_speed, VANILLA_LOCO_MAX_SPEED)
 
-if power_mult or weight_mult or braking_mult or speed_mult then
+-- Double-scale guard: 5Dim writes vanilla-derived absolute stats, so a tier-2
+-- value still BELOW a raised base value proves nobody rebalanced the tiers.
+-- If any raised stat of tier 2 already reaches the base value, 5Dim (or
+-- another mod) already follows the rebalanced base engine and rescaling would
+-- double-scale. Lowered stats (K2's top speed) follow that same decision.
+local function tiers_still_vanilla(tier2)
+    if not tier2 then return false end
+    local checks = {
+        { "max_power", power_mult, parse_energy(tier2.max_power), parse_energy(base_loco.max_power) },
+        { "weight", weight_mult, tier2.weight, base_loco.weight },
+        { "braking_force", braking_mult, tier2.braking_force, base_loco.braking_force },
+        { "max_speed", speed_mult, tier2.max_speed, base_loco.max_speed },
+    }
+    local raised = 0
+    for _, c in ipairs(checks) do
+        local field, mult, t2, base = c[1], c[2], c[3], c[4]
+        if mult and mult > 1 then
+            raised = raised + 1
+            if not (type(t2) == "number" and type(base) == "number" and t2 < base) then
+                log(string.format("[patchwork/train-tier] tier 2 %s %s already reaches the base %s - tiers already follow the base engine, left as-is",
+                    field, tostring(t2), tostring(base)))
+                return false
+            end
+        end
+    end
+    if raised == 0 then
+        log("[patchwork/train-tier] base locomotive stats were only lowered, tiers left as-is")
+        return false
+    end
+    return true
+end
+
+if not (power_mult or weight_mult or braking_mult or speed_mult) then
+    log("[patchwork/train-tier] base locomotive unchanged from vanilla, locomotive tiers left as-is")
+elseif tiers_still_vanilla(data.raw["locomotive"]["5d-locomotive-02"]) then
     for i = 2, 10 do
         local loco = data.raw["locomotive"][string.format("5d-locomotive-%02d", i)]
         if loco then
@@ -101,6 +136,4 @@ if power_mult or weight_mult or braking_mult or speed_mult then
             end
         end
     end
-else
-    log("[patchwork/train-tier] base locomotive unchanged from vanilla, locomotive tiers left as-is")
 end

@@ -1,15 +1,33 @@
 -- AutoDeconstruct's remove-target feature deconstructs a depleted drill's
--- output chest unless something it recognizes still drops into it - and it
--- only checks drop_target types (drill/inserter/assembler/furnace). LOADERS
--- attach via loader_container instead, so they are invisible to that check
--- (still true as of AutoDeconstruct 1.1.1) and a chest relaying a
--- loader->chest->loader transport chain gets torn out with the drill,
--- breaking the whole line. Guard: when a script marks a container for
--- deconstruction while a loader is connected to it and a depleted (or
--- already-marked) drill drops into it, cancel the mark. Player-made marks
--- (decon planner) are never touched.
+-- output chest unless something it recognizes still drops into it - and up to
+-- 1.1.1 it only checked drop_target types (drill/inserter/assembler/furnace).
+-- LOADERS attach via loader_container instead, so they were invisible to that
+-- check and a chest relaying a loader->chest->loader transport chain got torn
+-- out with the drill, breaking the whole line. Guard: when a script marks a
+-- container for deconstruction while a loader is connected to it and a
+-- depleted (or already-marked) drill drops into it, cancel the mark.
+-- Player-made marks (decon planner) are never touched.
+--
+-- AutoDeconstruct 1.1.2 (the first release for Factorio 2.1) counts input
+-- loaders as item sources itself, so relay chests are kept upstream. On top
+-- of that release the guard would only cancel marks AutoDeconstruct now places
+-- on purpose (a dead chest drained by an output loader), so it stands down.
 
-if not script.active_mods["AutoDeconstruct"] then return end
+local version = script.active_mods["AutoDeconstruct"]
+if not version then return end
+
+local function older_than(v, ref)
+  local a, b = {}, {}
+  for n in string.gmatch(v, "%d+") do a[#a + 1] = tonumber(n) end
+  for n in string.gmatch(ref, "%d+") do b[#b + 1] = tonumber(n) end
+  for i = 1, math.max(#a, #b) do
+    local x, y = a[i] or 0, b[i] or 0
+    if x ~= y then return x < y end
+  end
+  return false
+end
+
+if not older_than(version, "1.1.2") then return end
 
 local LOADER_SEARCH = 3 -- loaders touch the chest; 3 tiles covers any loader size
 local DRILL_SEARCH = 8  -- drop_position reach of the largest modded drills
